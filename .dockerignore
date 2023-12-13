@@ -4,4 +4,4 @@ output/
 *.rar
 *.tar.gz
 *.tar
-/
+/*

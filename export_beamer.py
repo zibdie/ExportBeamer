@@ -75,9 +75,11 @@ def savePosts(output_dir):
                     margin-bottom: 20px;
                 }}
             </style>
+            <meta name="description" content="Export of Beamer Announcements">
             <title>Beamer Export Announcements - {datetime.datetime.now().strftime('%Y-%m-%d')}</title>
         </head>
         <body>
+            <div style="display: none">Get a copy of this repository from https://github.com/zibdie/ExportBeamer</div>
             <div id="content"></div>
         </body>
         </html>""",
