@@ -1,12 +1,12 @@
-import requests, os, datetime, shutil, html
+import requests, os, datetime, shutil, html, argparse, logging
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
-
 load_dotenv()
 BEAMER_API_KEY = os.getenv("BEAMER_API_KEY") or None
+logging.basicConfig(level=logging.INFO)
 
 
-def savePosts():
+def savePosts(output_dir):
     def create_metadata_row(label, value):
         row = BeautifulSoup("", "html.parser").new_tag("tr")
         label_td = BeautifulSoup("", "html.parser").new_tag("td")
@@ -20,18 +20,19 @@ def savePosts():
     if not BEAMER_API_KEY:
         raise Exception("BEAMER_API_KEY is not set. Check your environment variables.")
 
+    logging.info("Fetching posts from Beamer API...")
     response = requests.get(
         "https://api.getbeamer.com/v0/posts?maxResults=500",
         headers={"Beamer-Api-Key": BEAMER_API_KEY},
     )
 
     if response.status_code != 200:
-        raise Exception("Error fetching posts from Beamer API")
-
+        raise Exception(f"Error fetching posts from Beamer API - HTTP Status Code: {response.status_code} - Response: {response.text}")
     posts = response.json()
 
+    logging.info("Information fetched successfully. Creating directory structure...")
+
     # Create output and imgs directories
-    output_dir = "output"
     if os.path.exists(output_dir):
         shutil.rmtree(output_dir, ignore_errors=False, onerror=None)
     imgs_dir = os.path.join(output_dir, "imgs")
@@ -45,6 +46,9 @@ def savePosts():
         file_path = os.path.join(output_dir, file)
         if os.path.isfile(file_path):
             os.remove(file_path)
+
+    logging.info("Directory structure created successfully.")
+    logging.info("Preparing HTML...")
 
     soup = BeautifulSoup(
         f"""
@@ -83,6 +87,7 @@ def savePosts():
     content_div = soup.find("div", {"id": "content"})
 
     for post in posts:
+        logging.info(f"Processing post {post['id']}...")
         post_div = soup.new_tag(
             "div", attrs={"id": str(post["id"]), "class": "post-div"}
         )
@@ -98,12 +103,13 @@ def savePosts():
         for img_count, img_tag in enumerate(parsed_html.find_all("img"), start=1):
             img_url = img_tag["src"]
             img_response = requests.get(img_url)
-            if img_response.status_code == 200:
-                img_filename = f"{post['id']}-{img_count}.png"
-                img_path = os.path.join(imgs_dir, img_filename)
-                with open(img_path, "wb") as img_file:
-                    img_file.write(img_response.content)
-                img_tag["src"] = os.path.join("imgs", img_filename)
+            if img_response.status_code != 200:
+                raise Exception(f"Error fetching image {img_url} - HTTP Status Code: {img_response.status_code} - Response: {img_response.text}")
+            img_filename = f"{post['id']}-{img_count}.png"
+            img_path = os.path.join(imgs_dir, img_filename)
+            with open(img_path, "wb") as img_file:
+                img_file.write(img_response.content)
+            img_tag["src"] = os.path.join("imgs", img_filename)
 
         post["translations"][0]["contentHtml"] = str(parsed_html)
 
@@ -180,15 +186,32 @@ def savePosts():
         content_div.append(post_div)
 
     soup.prettify()
+    logging.info("HTML prepared successfully. Saving file...")
     with open(
         os.path.join(
-            "output",
+            output_dir,
             f"beamer_export_{datetime.datetime.now().strftime('%Y-%m-%d')}.html",
         ),
         "w",
         encoding="utf-8",
     ) as file:
         file.write(str(soup))
+    logging.info(f"Export saved successfully to {output_dir}! Exiting...")
 
 
-savePosts()
+parser = argparse.ArgumentParser(description="Save posts to specified output directory.")
+parser.add_argument("--output-dir", type=str, help="The directory where output will be saved", required=False)
+args = parser.parse_args()
+op_dir = args.output_dir
+if not op_dir:
+    op_dir = os.path.join(os.getcwd(), f"beamer_export_{datetime.datetime.now().strftime('%Y-%m-%d')}")
+    logging.info(f"Output directory not specified. Using default directory {op_dir}")
+else:
+    if(not os.path.exists(op_dir)):
+        raise Exception(f"Output directory '{op_dir}' does not exist.")
+    logging.info(f"Output directory specified. Using {op_dir} as output directory.")
+    op_dir = os.path.join(op_dir, f"beamer_export_{datetime.datetime.now().strftime('%Y-%m-%d')}")
+try:
+    savePosts(op_dir)
+except Exception as e:
+    logging.error(e)

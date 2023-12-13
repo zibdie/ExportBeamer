@@ -2,10 +2,10 @@ FROM python:3.9-slim-buster
 
 WORKDIR /app
 
-COPY requirements.txt requirements.txt
+COPY . /app
 
-RUN pip3 install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+ENV OUTPUT_DIR=/app/output
 
-CMD [ "python3", "main.py"]
+CMD ["python", "./beamer_export.py", "--output-dir", "${OUTPUT_DIR}"]
