@@ -57,4 +57,9 @@ The script does allow a export location to be specified:
 (venv) myuser> python export_beamer.py --output-dir "C:\Users\myuser\myproject"
 ```
 
- 
+## Running through Docker
+
+The latest image is available through DockerHub. You can get started instantly by running:
+```
+docker run -e BEAMER_API_KEY=<YOUR BEAMER KEY HERE> -v ./output:/app/output zibdie/exportbeamer:latest
+```

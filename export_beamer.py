@@ -17,7 +17,7 @@ def savePosts(output_dir):
         row.append(value_td)
         return row
 
-    if not BEAMER_API_KEY:
+    if not BEAMER_API_KEY or len(BEAMER_API_KEY) == "":
         raise Exception("BEAMER_API_KEY is not set. Check your environment variables.")
 
     logging.info("Fetching posts from Beamer API...")
