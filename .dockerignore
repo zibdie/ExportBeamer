@@ -1,2 +1,6 @@
 venv/
 output/
+*.zip
+*.rar
+*.tar.gz
+*.tar

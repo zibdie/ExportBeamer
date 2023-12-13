@@ -160,3 +160,8 @@ cython_debug/
 #.idea/
 
 output/
+
+*.zip
+*.rar
+*.tar.gz
+*.tar
