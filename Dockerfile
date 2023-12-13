@@ -8,4 +8,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 ENV OUTPUT_DIR=/app/output
 
-CMD ["python", "./beamer_export.py", "--output-dir", "${OUTPUT_DIR}"]
+CMD ["python", "./export_beamer.py", "--output-dir", "${OUTPUT_DIR}"]
