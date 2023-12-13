@@ -63,3 +63,9 @@ The latest image is available through DockerHub. You can get started instantly b
 ```
 docker run -e BEAMER_API_KEY=<YOUR BEAMER KEY HERE> -v ./output:/app/output zibdie/exportbeamer:latest
 ```
+
+You can run it locally by running this one command in this project's directory after you have cloned it to your machine:
+```
+docker build -t export_beamer . && docker run -e BEAMER_API_KEY=<YOUR BEAMER KEY HERE> -v /path/to/local/output:/app/output export_beamer
+```
+*You can ommit the `-e` in the command and put your key in the .env file*
