@@ -202,8 +202,8 @@ def savePosts(output_dir):
 parser = argparse.ArgumentParser(description="Save posts to specified output directory.")
 parser.add_argument("--output-dir", type=str, help="The directory where output will be saved", required=False)
 args = parser.parse_args()
-op_dir = args.output_dir
-if not op_dir:
+op_dir = None
+if not args.output_dir or args.output_dir == "":
     op_dir = os.path.join(os.getcwd(), f"beamer_export_{datetime.datetime.now().strftime('%Y-%m-%d')}")
     logging.info(f"Output directory not specified. Using default directory {op_dir}")
 else:
