@@ -1,5 +1,7 @@
 # ExportBeamer
 
+[https://github.com/zibdie/ExportBeamer](https://github.com/zibdie/ExportBeamer)
+
 ## Export your posts easily from Beamer (getbeamer.com)
 
 Beamer [https://www.getbeamer.com/] makes it incredibly difficult to export your announcements in a neat and clean matter. In fact, according to their support, you can only do that via their API which makes the barrier much higher for those who are not used to scraping. This script should make the process simple and easy.
